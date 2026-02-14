@@ -2,7 +2,9 @@
 description: Commit changed files
 ---
 
-Commit the code changes following these rules:
+First, run the `/format` command to format all changed files before committing.
+
+Then, commit the code changes following these rules:
 
 - Use imperative mood ("Add feature" not "Added feature")
 - Be extremely concise while remaining informative
