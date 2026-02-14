@@ -2,7 +2,8 @@
 description: Commit changed files
 ---
 
-First, run the `/format` command to format all changed files before committing.
+First, run the `/lint` command to lint all changed files before formatting.
+Second, run the `/format` command to format all changed files before committing.
 
 Then, commit the code changes following these rules:
 

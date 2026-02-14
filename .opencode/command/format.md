@@ -27,6 +27,7 @@ Use this mapping to determine which formatter and mise package to use:
 | `.html`                              | Prettier  | `npm:prettier`       | `prettier --write <file>`     |
 | `.yaml`, `.yml`                      | Prettier  | `npm:prettier`       | `prettier --write <file>`     |
 | `.toml`                              | Taplo     | `npm:@taplo/cli`     | `taplo format <file>`         |
+| `.kdl`                               | kdlfmt    | `cargo:kdlfmt`       | `kdlfmt format <file>`        |
 
 If a file extension is **not** in this table, do NOT skip it. Instead:
 
@@ -79,4 +80,4 @@ After all files are processed, output a summary:
 
 If no changed files were found in Step 1, output "No changed files to format."
 
-When everything is done, display \`Dunso.\`
+After the formatting is successful, output "Dunso." formatted in backticks.

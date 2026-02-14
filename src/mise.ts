@@ -1,5 +1,5 @@
 import { exists } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { dirname, } from "node:path";
 import { downloadLatestReleaseAsset } from "./github.ts";
 
 function getMiseAssetSuffix(): string {
@@ -67,8 +67,8 @@ export async function runMise(
 	}
 
 	const miseDir = dirname(misePath);
-	const extraPath = env["PATH"] ?? "";
-	const systemPath = process.env["PATH"] ?? "";
+	const extraPath = env.PATH ?? "";
+	const systemPath = process.env.PATH ?? "";
 	const proc = Bun.spawn([misePath, ...args], {
 		cwd: cwd ?? miseDir,
 		env: {

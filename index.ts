@@ -33,9 +33,9 @@ async function loadEnv(): Promise<Record<string, string>> {
 async function main() {
 	const env = await loadEnv();
 	const misePath = join(ROOT_DIR, "bin", "mise");
-	const zellijConfig = join(env["XDG_CONFIG_HOME"]!, "zellij", "config.kdl");
+	const zellijConfig = join(env.XDG_CONFIG_HOME ?? "", "zellij", "config.kdl");
 	const zellijLayout = join(
-		env["XDG_CONFIG_HOME"]!,
+		env.XDG_CONFIG_HOME ?? "",
 		"zellij",
 		"layouts",
 		"default.kdl",
@@ -45,7 +45,7 @@ async function main() {
 	await runMise(misePath, ["trust"], env, ROOT_DIR);
 	await runMise(misePath, ["install"], env, ROOT_DIR);
 
-	const browsersDir = join(env["XDG_CACHE_HOME"]!, "ms-playwright");
+	const browsersDir = join(env.XDG_CACHE_HOME ?? "", "ms-playwright");
 	if (!(await exists(browsersDir))) {
 		await runMise(
 			misePath,
@@ -55,7 +55,7 @@ async function main() {
 		);
 	}
 
-	const zellijMcpDir = join(env["XDG_CACHE_HOME"]!, "zellij-mcp-server");
+	const zellijMcpDir = join(env.XDG_CACHE_HOME ?? "", "zellij-mcp-server");
 	if (!(await exists(zellijMcpDir))) {
 		const cloneProc = Bun.spawn(
 			[
@@ -79,12 +79,12 @@ async function main() {
 
 	const playwrightBinDirs = await getPlaywrightBinDirs(browsersDir);
 	if (playwrightBinDirs.length > 0) {
-		env["PATH"] = playwrightBinDirs.join(":") + ":" + (env["PATH"] ?? "");
+		env.PATH = `${playwrightBinDirs.join(":")}:${env.PATH ?? ""}`;
 	}
 
 	const chromiumPath = await getChromiumExecutable(browsersDir);
 	if (chromiumPath) {
-		env["CHROMIUM_BIN"] = chromiumPath;
+		env.CHROMIUM_BIN = chromiumPath;
 	}
 
 	await runMise(
@@ -98,7 +98,7 @@ async function main() {
 			"--layout",
 			zellijLayout,
 			"attach",
-			env["SESSION_NAME"]!,
+			env.SESSION_NAME ?? "",
 			"--create",
 		],
 		env,
