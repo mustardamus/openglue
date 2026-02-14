@@ -46,6 +46,15 @@ async function main() {
     );
   }
 
+  const zellijMcpDir = join(env["XDG_CACHE_HOME"]!, "zellij-mcp-server");
+  if (!(await exists(zellijMcpDir))) {
+    const proc = Bun.spawn(
+      ["git", "clone", "https://github.com/GitJuhb/zellij-mcp-server.git", zellijMcpDir],
+      { stdout: "inherit", stderr: "inherit", env: { ...process.env, ...env } },
+    );
+    await proc.exited;
+  }
+
   const playwrightBinDirs = await getPlaywrightBinDirs(browsersDir);
   if (playwrightBinDirs.length > 0) {
     env["PATH"] = playwrightBinDirs.join(":") + ":" + (env["PATH"] ?? "");

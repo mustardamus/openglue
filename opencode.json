@@ -18,6 +18,14 @@
         "-c",
         "chrome-devtools-mcp --executablePath=$CHROMIUM_BIN --headless=true --isolated"
       ]
+    },
+    "zellij": {
+      "enabled": true,
+      "type": "local",
+      "command": [
+        "node",
+        "./cache/zellij-mcp-server/dist/index.js"
+      ]
     }
   }
 }
