@@ -194,6 +194,14 @@ main() {
 			echo "     sudo apt install bubblewrap    # Debian/Ubuntu"
 			echo "     sudo pacman -S bubblewrap      # Arch"
 			echo "     sudo dnf install bubblewrap    # Fedora"
+			echo ""
+			echo "   or install podman:"
+			echo "     sudo apt install podman         # Debian/Ubuntu"
+			echo "     sudo pacman -S podman           # Arch"
+			echo "     sudo dnf install podman         # Fedora"
+			echo ""
+			echo "   or install docker:"
+			echo "     https://docs.docker.com/engine/install/"
 			exit 1
 		fi
 

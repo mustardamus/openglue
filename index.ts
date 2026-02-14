@@ -74,6 +74,9 @@ async function main() {
 		console.error("");
 		console.error("   start with:");
 		console.error("     ./run.sh              # auto-detect isolation");
+		console.error("     ./run.sh bubblewrap   # use bubblewrap (recommended)");
+		console.error("     ./run.sh podman       # use podman");
+		console.error("     ./run.sh docker       # use docker");
 		console.error("     ./run.sh none         # explicitly skip isolation");
 		process.exit(1);
 	}
