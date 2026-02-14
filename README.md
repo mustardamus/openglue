@@ -11,8 +11,9 @@ When you run `bun run index.ts`, the following cascade of events unfolds:
 1. Downloads [mise](https://github.com/jdx/mise) (a polyglot runtime manager) if it's not already sitting in `./bin/`
 2. Uses mise to install a curated set of tools (see below)
 3. Installs a Chromium browser via Playwright (for Chrome DevTools MCP -- yes, your AI can browse the web now, be afraid)
-4. Wires up all the environment paths so tools can actually find each other
-5. Launches a [Zellij](https://zellij.dev/) terminal multiplexer session with [Fish](https://fishshell.com/) shell, Tokyo Night theme, and a preconfigured layout
+4. Clones and installs the [Zellij MCP Server](https://github.com/mustardamus/zellij-mcp-server) (so your AI can manage terminal panes too -- no one is safe)
+5. Wires up all the environment paths so tools can actually find each other
+6. Launches a [Zellij](https://zellij.dev/) terminal multiplexer session with [Fish](https://fishshell.com/) shell, Tokyo Night theme, and a preconfigured layout
 
 You end up in a beautiful, fully isolated terminal workspace. Everything lives inside the project directory. Delete the folder and it's like it never happened. Like a responsible one-night stand with your operating system.
 
@@ -24,9 +25,11 @@ You end up in a beautiful, fully isolated terminal workspace. Everything lives i
 | [Node.js](https://nodejs.org) | JS runtime | Because npm packages still exist |
 | [Playwright](https://playwright.dev) | Browser automation | Installs Chromium for Chrome DevTools MCP |
 | [Chrome DevTools MCP](https://www.npmjs.com/package/chrome-devtools-mcp) | MCP server | Lets AI coding assistants inspect browsers |
+| [Zellij MCP Server](https://github.com/mustardamus/zellij-mcp-server) | MCP server | Lets AI coding assistants control Zellij sessions |
 | [Fish](https://fishshell.com) | Shell | Autocompletions that actually work |
 | [opencode](https://opencode.ai) | AI coding assistant | Your new pair programmer (TUI) |
 | [Zellij](https://zellij.dev) | Terminal multiplexer | tmux but you don't need a PhD to configure it |
+| [Starship](https://starship.rs) | Shell prompt | Minimal, fast, cross-shell prompt |
 | [lazygit](https://github.com/jesseduffield/lazygit) | Git TUI | For when `git log --oneline --graph` isn't cutting it |
 
 ## Getting Started
@@ -69,6 +72,7 @@ The `.env` file controls where everything lives. By default, all paths are relat
 | `XDG_CACHE_HOME` | `./cache` | Caches (including Playwright browsers) |
 | `SESSION_NAME` | `openglue` | Zellij session name |
 | `BROWSER` | `zen-browser` | Default browser |
+| `ZELLIJ_MCP_SERVER_DUMP_DIR` | `./cache/zellij-mcp-server` | Zellij MCP Server dump directory |
 
 ## Project Structure
 
@@ -81,6 +85,7 @@ openglue/
 │   └── playwright.ts     # Chromium installation and path discovery
 ├── config/               # All tool configs live here (XDG_CONFIG_HOME)
 │   ├── fish/             # Fish shell config
+│   ├── starship.toml     # Starship prompt config
 │   ├── zellij/           # Zellij config + layouts (Tokyo Night theme)
 │   └── lazygit/          # lazygit config
 ├── bin/                  # Downloaded binaries (mise lives here)
@@ -122,4 +127,4 @@ The result: **zero side effects on your system**. `rm -rf openglue/` and it's go
 
 ## Status
 
-Early development. 7 commits in. The foundation is solid, the vibes are immaculate, and the test suite is... aspirational.
+Early development. 10 commits in. The foundation is solid, the vibes are immaculate, and the test suite is... aspirational.

@@ -1,0 +1,77 @@
+# Minimal & Clean Starship prompt
+# Single-line, muted palette, essentials only
+
+add_newline = false
+format = "$directory$git_branch$git_status$cmd_duration$character"
+
+[character]
+success_symbol = "[›](bold green)"
+error_symbol = "[›](bold red)"
+
+[directory]
+style = "bold cyan"
+truncation_length = 3
+truncate_to_repo = true
+
+[git_branch]
+format = "[$symbol$branch]($style) "
+symbol = ""
+style = "dimmed purple"
+
+[git_status]
+format = '([$all_status$ahead_behind]($style) )'
+style = "dimmed yellow"
+conflicted = "="
+ahead = "⇡"
+behind = "⇣"
+diverged = "⇕"
+untracked = "?"
+stashed = "$"
+modified = "!"
+staged = "+"
+deleted = "✘"
+
+[cmd_duration]
+min_time = 2_000
+format = "[$duration]($style) "
+style = "dimmed white"
+
+[fill]
+symbol = " "
+
+# Hide modules we don't need
+[package]
+disabled = true
+
+[nodejs]
+disabled = true
+
+[python]
+disabled = true
+
+[rust]
+disabled = true
+
+[golang]
+disabled = true
+
+[java]
+disabled = true
+
+[ruby]
+disabled = true
+
+[php]
+disabled = true
+
+[lua]
+disabled = true
+
+[docker_context]
+disabled = true
+
+[aws]
+disabled = true
+
+[gcloud]
+disabled = true
