@@ -1,4 +1,5 @@
 [tools]
 bun = "latest"
+"aqua:fish-shell/fish-shell" = "latest"
 opencode = "latest"
 zellij = "latest"
