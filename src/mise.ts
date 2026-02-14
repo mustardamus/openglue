@@ -56,31 +56,23 @@ export async function getLatestMise(): Promise<string> {
   return dest;
 }
 
-export async function runMise(args: string[]): Promise<string> {
+export async function runMise(args: string[]): Promise<void> {
   if (!(await exists(MISE_WRAPPER))) {
-    throw new Error("mise wrapper not found. Run createMiseWrapper() first.");
+    throw new Error("mise wrapper not found. Run ensureMise() first.");
   }
 
   const proc = Bun.spawn([MISE_WRAPPER, ...args], {
     cwd: ROOT_DIR,
-    stdout: "pipe",
-    stderr: "pipe",
+    stdin: "inherit",
+    stdout: "inherit",
+    stderr: "inherit",
   });
-
-  const [stdout, stderr] = await Promise.all([
-    new Response(proc.stdout).text(),
-    new Response(proc.stderr).text(),
-  ]);
 
   const exitCode = await proc.exited;
 
   if (exitCode !== 0) {
-    throw new Error(
-      `mise ${args.join(" ")} failed (exit ${exitCode}):\n${stderr}`,
-    );
+    throw new Error(`mise ${args.join(" ")} failed (exit ${exitCode})`);
   }
-
-  return stdout.trim();
 }
 
 export async function createMiseWrapper(): Promise<void> {
@@ -106,6 +98,7 @@ exec "\${SCRIPT_DIR}/mise/mise" "$@"
 
   console.log(`mise wrapper created at ${MISE_WRAPPER}`);
 }
+
 
 export async function ensureMise(): Promise<void> {
   if (!(await exists(MISE_PATH))) {
