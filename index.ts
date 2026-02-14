@@ -26,13 +26,13 @@ async function loadEnv(): Promise<Record<string, string>> {
 
 async function main() {
   const env = await loadEnv();
-  const misePath = join(env["MISE_DATA_DIR"]!, "mise");
+  const misePath = join(ROOT_DIR, "bin", "mise");
   const zellijConfig = join(env["XDG_CONFIG_HOME"]!, "zellij", "config.kdl");
   const zellijLayout = join(env["XDG_CONFIG_HOME"]!, "zellij", "layouts", "default.kdl");
 
   await ensureMise(misePath);
-  await runMise(misePath, ["trust"], env);
-  await runMise(misePath, ["install"], env);
+  await runMise(misePath, ["trust"], env, ROOT_DIR);
+  await runMise(misePath, ["install"], env, ROOT_DIR);
   await runMise(
     misePath,
     [
@@ -48,6 +48,7 @@ async function main() {
       "--create",
     ],
     env,
+    ROOT_DIR,
   );
 }
 

@@ -60,13 +60,14 @@ export async function runMise(
   misePath: string,
   args: string[],
   env: Record<string, string>,
+  cwd?: string,
 ): Promise<void> {
   if (!(await exists(misePath))) {
     throw new Error("mise binary not found. Run ensureMise() first.");
   }
 
   const proc = Bun.spawn([misePath, ...args], {
-    cwd: join(misePath, ".."),
+    cwd: cwd ?? join(misePath, ".."),
     env: { ...process.env, ...env },
     stdin: "inherit",
     stdout: "inherit",
