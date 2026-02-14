@@ -62,6 +62,22 @@ async function loadEnv(): Promise<Record<string, string>> {
 }
 
 async function main() {
+	await bootstrapConfigs(ROOT_DIR);
+
+	const isCompiledBinary = import.meta.path.startsWith("/$bunfs/");
+
+	if (isCompiledBinary && !process.env.OPENGLUE_ISOLATION) {
+		console.error(`:: bootstrapped config files to ${ROOT_DIR}`);
+		console.error(
+			":: not launched via run.sh — refusing to run without isolation",
+		);
+		console.error("");
+		console.error("   start with:");
+		console.error("     ./run.sh              # auto-detect isolation");
+		console.error("     ./run.sh none         # explicitly skip isolation");
+		process.exit(1);
+	}
+
 	const env = await loadEnv();
 	const misePath = join(ROOT_DIR, "bin", "mise");
 	const zellijConfig = join(env.XDG_CONFIG_HOME ?? "", "zellij", "config.kdl");
@@ -71,8 +87,6 @@ async function main() {
 		"layouts",
 		"default.kdl",
 	);
-
-	await bootstrapConfigs(ROOT_DIR);
 
 	await ensureMise(misePath);
 	await runMise(misePath, ["trust"], env, ROOT_DIR);

@@ -51,6 +51,7 @@ Code formatting is handled by the `/format` command in opencode. It automaticall
 | rustfmt   | (bundled with rust)  | `.rs`                                                                    |
 | gofmt     | (bundled with go)    | `.go`                                                                    |
 | kdlfmt    | `cargo:kdlfmt`       | `.kdl`                                                                   |
+| shfmt     | `aqua:mvdan/sh`      | `.sh`                                                                    |
 
 For file types not listed above, the format command will research the standard formatter, propose it, and install it on confirmation. All formatters are managed through mise and run via `mise exec --`.
 
@@ -58,13 +59,14 @@ For file types not listed above, the format command will research the standard f
 
 Code linting is handled by the `/lint` command in opencode. Like `/format`, it automatically detects changed files, maps them to the appropriate linter, and installs any missing linters via mise on-the-fly.
 
-| Linter       | Mise package           | File types                                                               |
-| ------------ | ---------------------- | ------------------------------------------------------------------------ |
-| Biome        | `npm:@biomejs/biome`   | `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`, `.json`, `.jsonc`, `.css`, `.scss` |
-| Taplo        | `npm:@taplo/cli`       | `.toml`                                                                  |
-| markdownlint | `npm:markdownlint-cli` | `.md`                                                                    |
-| yamllint     | `pipx:yamllint`        | `.yaml`, `.yml`                                                          |
-| kdlfmt       | `cargo:kdlfmt`         | `.kdl`                                                                   |
+| Linter       | Mise package               | File types                                                               |
+| ------------ | -------------------------- | ------------------------------------------------------------------------ |
+| Biome        | `npm:@biomejs/biome`       | `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`, `.json`, `.jsonc`, `.css`, `.scss` |
+| Taplo        | `npm:@taplo/cli`           | `.toml`                                                                  |
+| markdownlint | `npm:markdownlint-cli`     | `.md`                                                                    |
+| yamllint     | `pipx:yamllint`            | `.yaml`, `.yml`                                                          |
+| kdlfmt       | `cargo:kdlfmt`             | `.kdl`                                                                   |
+| shellcheck   | `aqua:koalaman/shellcheck` | `.sh`                                                                    |
 
 For file types not listed above, the lint command will research the standard linter, propose it, and install it on confirmation. All linters are managed through mise and run via `mise exec --`.
 
@@ -84,7 +86,13 @@ mkdir myproject && cd myproject
 ./openglue-linux-x64
 ```
 
-That's it. The binary embeds all necessary config files and bootstraps them on first run. Go make coffee. When you come back, you'll have a fully configured Zellij session staring at you.
+On first run, the binary bootstraps all config files -- including `run.sh` -- then exits with a message telling you to use `run.sh` instead. From that point on:
+
+```bash
+./run.sh
+```
+
+That's it. Go make coffee. When you come back, you'll have a fully configured Zellij session staring at you.
 
 ### From Source
 
@@ -126,6 +134,7 @@ The `.env` file controls where everything lives. By default, all paths are relat
 ```text
 openglue/
 ├── index.ts              # The orchestrator. Runs the whole show.
+├── run.sh                # Isolation wrapper (embedded, bootstrapped on first run)
 ├── src/
 │   ├── bootstrap.ts      # Embeds and writes config files on first run
 │   ├── github.ts         # GitHub API client for downloading releases
@@ -140,7 +149,7 @@ openglue/
 │   └── lazygit/          # lazygit config
 ├── bin/                  # Downloaded binaries (mise lives here)
 ├── mise/                 # mise internal data (tools installed here)
-├── data/                 # XDG_DATA_HOME
+├── data/                 # XDG_DATA_HOME (also rustup, cargo, go toolchains)
 ├── state/                # XDG_STATE_HOME
 ├── cache/                # XDG_CACHE_HOME (Playwright browsers live here)
 ├── .env.example          # Environment template
@@ -149,6 +158,77 @@ openglue/
 ├── package.json          # Project manifest
 └── tsconfig.json         # TypeScript config (strict, as God intended)
 ```
+
+## Sandbox Isolation
+
+openglue refuses to run unless it's launched through `run.sh`. The binary checks for the `OPENGLUE_ISOLATION` environment variable (set by `run.sh`) and exits immediately if it's missing. This ensures every run goes through the isolation layer.
+
+### How It Works
+
+`run.sh` is embedded inside the compiled binary and bootstrapped to disk on first run alongside all other config files. It's a plain bash script that:
+
+1. **Detects if already containerized** -- checks for `/.dockerenv`, `/run/.containerenv`, the `$container` env var, cgroup contents, and WSL kernel signatures. If already inside a container, it runs the binary directly.
+2. **Finds the best available isolation backend** in priority order:
+   - **[Bubblewrap](https://github.com/containers/bubblewrap)** (recommended) -- lightweight namespace sandbox, no daemon, no root
+   - **[Podman](https://podman.io/)** -- daemonless, rootless container runtime
+   - **[Docker](https://www.docker.com/)** -- container runtime (requires running daemon)
+   - **[unshare](https://man7.org/linux/man-pages/man1/unshare.1.html)** -- raw Linux namespace isolation
+3. **Wraps the binary** in the chosen isolation backend and execs it.
+
+If no backend is found, `run.sh` prints install instructions and exits. It won't silently run without isolation.
+
+### Usage
+
+```bash
+# Auto-detect the best isolation backend
+./run.sh
+
+# Force a specific backend
+./run.sh bubblewrap
+./run.sh podman
+./run.sh docker
+./run.sh unshare
+
+# Explicitly skip isolation (you've been warned)
+./run.sh none
+```
+
+### What the Bubblewrap Sandbox Does
+
+The bubblewrap backend creates a sandboxed environment with:
+
+- **PID, IPC, and UTS namespace isolation** -- processes inside the sandbox can't see or signal host processes
+- **Read-only system mounts** -- `/usr`, `/lib`, `/bin`, `/sbin`, `/etc`, `/opt` are mounted read-only (with symlink handling for merged-usr distros like Arch and Fedora)
+- **Ephemeral writable layers** -- `$HOME`, `/tmp`, `/var/tmp`, and `$XDG_RUNTIME_DIR` are tmpfs mounts that vanish when the sandbox exits
+- **Project directory read-write** -- only the project directory is writable and persistent
+- **Network access preserved** -- needed for downloading tools and API calls
+- **PTY support** -- `--dev /dev` creates a minimal devtmpfs so Zellij can allocate pseudo-terminals for its panes
+- **DNS and SSL/TLS** -- `/etc/resolv.conf`, `/etc/hosts`, and certificate directories are bind-mounted read-only
+- **Toolchain persistence** -- `RUSTUP_HOME`, `CARGO_HOME`, and `GOPATH` are pointed into the project's `data/` directory so mise doesn't reinstall them on every run
+
+### Installing Bubblewrap
+
+```bash
+# Debian/Ubuntu
+sudo apt install bubblewrap
+
+# Arch
+sudo pacman -S bubblewrap
+
+# Fedora
+sudo dnf install bubblewrap
+```
+
+### The Bootstrap Sequence
+
+1. You run `./openglue-linux-x64` for the first time
+2. The binary writes all embedded config files to disk, including `run.sh`
+3. The binary detects `OPENGLUE_ISOLATION` is not set, prints a message pointing you to `run.sh`, and exits
+4. You run `./run.sh`
+5. `run.sh` detects the best isolation backend, sets `OPENGLUE_ISOLATION`, and execs the binary inside the sandbox
+6. The binary sees `OPENGLUE_ISOLATION` is set and proceeds with the full setup (mise, tools, Zellij, etc.)
+
+On subsequent runs, `run.sh` already exists, so you just run `./run.sh` directly.
 
 ## How It Works (The Nerdy Bits)
 

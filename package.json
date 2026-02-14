@@ -11,5 +11,8 @@
 		"build": "bun run tasks/build.ts"
 	},
 	"private": true,
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"bash-language-server": "^5.6.0"
+	}
 }

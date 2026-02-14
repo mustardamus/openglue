@@ -28,6 +28,7 @@ Use this mapping to determine which formatter and mise package to use:
 | `.yaml`, `.yml`                      | Prettier  | `npm:prettier`       | `prettier --write <file>`     |
 | `.toml`                              | Taplo     | `npm:@taplo/cli`     | `taplo format <file>`         |
 | `.kdl`                               | kdlfmt    | `cargo:kdlfmt`       | `kdlfmt format <file>`        |
+| `.sh`                                | shfmt     | `aqua:mvdan/sh`      | `shfmt -w <file>`             |
 
 If a file extension is **not** in this table, do NOT skip it. Instead:
 
