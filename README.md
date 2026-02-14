@@ -36,6 +36,20 @@ You end up in a beautiful, fully isolated terminal workspace. Everything lives i
 | [Rust](https://rust-lang.org)                                            | Language toolchain     | For when you want speed and the compiler to yell at you       |
 | [Go](https://go.dev)                                                     | Language toolchain     | Concurrency, simplicity, and `if err != nil`                  |
 
+## Formatting
+
+Code formatting is handled by the `/format` command in opencode. It automatically detects changed files, maps them to the appropriate formatter, and installs any missing formatters via mise on-the-fly.
+
+| Formatter | Mise package         | File types                                              |
+| --------- | -------------------- | ------------------------------------------------------- |
+| Biome     | `npm:@biomejs/biome` | `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`, `.json`, `.jsonc`, `.css`, `.scss` |
+| Prettier  | `npm:prettier`       | `.md`, `.html`, `.yaml`, `.yml`                         |
+| Taplo     | `npm:@taplo/cli`     | `.toml`                                                 |
+| rustfmt   | (bundled with rust)  | `.rs`                                                   |
+| gofmt     | (bundled with go)    | `.go`                                                   |
+
+For file types not listed above, the format command will research the standard formatter, propose it, and install it on confirmation. All formatters are managed through mise and run via `mise exec --`.
+
 ## Getting Started
 
 ### Prerequisites

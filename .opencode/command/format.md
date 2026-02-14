@@ -39,7 +39,9 @@ If a file extension is **not** in this table, do NOT skip it. Instead:
    mapping. The standard formatter for this file type is `<name>`
    (`<mise-package>`). Install it?" — wait for confirmation.
 4. On confirmation, proceed with installation and formatting as with any other
-   formatter. On decline, skip those files.
+   formatter. After installing, add the new formatter to both the mapping table
+   in this file (`format.md`) and the Formatting table in `README.md`, following
+   the existing column format. On decline, skip those files.
 
 ## Step 3: Check formatter availability and install if needed
 
@@ -55,6 +57,11 @@ checks using `mise exec --` prefix so the mise-managed PATH is active.
   `mise use <mise-package>`?" — wait for confirmation before proceeding.
 - On confirmation, run `mise use <mise-package>` then `mise install` to install
   the formatter and add it to `mise.toml`.
+- After installing a new formatter, also add it to the Formatting table in
+  `README.md`. Insert a new row into the table in the "## Formatting" section,
+  following the same column format as existing rows (Extensions, Formatter, Mise
+  package, Format command). Place the new row in a logical position — group it
+  near similar formatters or append it at the end of the table.
 - If the user declines, skip all files that need that formatter.
 
 ## Step 4: Format files
