@@ -133,9 +133,13 @@ run_container() {
 	[[ "$cli" == "podman" ]] && selinux=":Z"
 
 	exec "$cli" run --rm --interactive --tty \
+		--env OPENGLUE_ISOLATION \
+		--env TERM="${TERM:-xterm-256color}" \
+		--env COLORTERM="${COLORTERM:-truecolor}" \
+		--env LANG="C.UTF-8" \
+		--env SHELL="/bin/sh" \
 		--volume "$SCRIPT_DIR:$SCRIPT_DIR$selinux" \
 		--workdir "$SCRIPT_DIR" \
-		--network none \
 		docker.io/library/ubuntu:latest \
 		"$BINARY" "$@"
 }

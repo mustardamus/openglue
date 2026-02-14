@@ -114,6 +114,23 @@ bun run build
 
 The build produces binaries for all supported platforms in `./dist/`.
 
+#### Build Dependencies
+
+Linux targets are compiled inside the official `oven/bun` Docker image to ensure ICU is statically linked (avoiding `libicu` version mismatches across distros). This requires [Podman](https://podman.io/) on the build machine:
+
+```bash
+# Debian/Ubuntu
+sudo apt install podman
+
+# Arch
+sudo pacman -S podman
+
+# Fedora
+sudo dnf install podman
+```
+
+Darwin targets are compiled natively and don't require Podman.
+
 ### Environment Variables
 
 The `.env` file controls where everything lives. By default, all paths are relative to the project root:
@@ -176,6 +193,15 @@ openglue refuses to run unless it's launched through `run.sh`. The binary checks
 3. **Wraps the binary** in the chosen isolation backend and execs it.
 
 If no backend is found, `run.sh` prints install instructions and exits. It won't silently run without isolation.
+
+### What the Podman/Docker Backend Does
+
+The container backend runs the binary inside an `ubuntu:latest` container with:
+
+- **Project directory mounted read-write** -- the project directory is volume-mounted into the container (with `:Z` SELinux relabeling for Podman)
+- **Network access preserved** -- needed for downloading tools via mise on first run
+- **Terminal environment forwarded** -- `TERM`, `COLORTERM`, and `LANG` are passed through so Zellij and Fish render correctly
+- **Ephemeral container** -- `--rm` ensures the container is removed after the session ends; all persistent state lives in the project directory
 
 ### Usage
 
