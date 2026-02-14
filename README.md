@@ -189,7 +189,6 @@ openglue refuses to run unless it's launched through `run.sh`. The binary checks
    - **[Bubblewrap](https://github.com/containers/bubblewrap)** (recommended) -- lightweight namespace sandbox, no daemon, no root
    - **[Podman](https://podman.io/)** -- daemonless, rootless container runtime
    - **[Docker](https://www.docker.com/)** -- container runtime (requires running daemon)
-   - **[unshare](https://man7.org/linux/man-pages/man1/unshare.1.html)** -- raw Linux namespace isolation
 3. **Wraps the binary** in the chosen isolation backend and execs it.
 
 If no backend is found, `run.sh` prints install instructions and exits. It won't silently run without isolation.
@@ -213,8 +212,6 @@ The container backend runs the binary inside an `ubuntu:latest` container with:
 ./run.sh bubblewrap
 ./run.sh podman
 ./run.sh docker
-./run.sh unshare
-
 # Explicitly skip isolation (you've been warned)
 ./run.sh none
 ```

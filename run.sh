@@ -28,7 +28,7 @@ is_containerized() {
 }
 
 # ── Isolation backend detection ──────────────────────────────────────
-# Priority: bubblewrap > podman/docker > unshare > none
+# Priority: bubblewrap > podman/docker > none
 
 find_backend() {
 	if command -v bwrap &>/dev/null; then
@@ -44,13 +44,6 @@ find_backend() {
 	if command -v docker &>/dev/null && docker info &>/dev/null; then
 		echo "docker"
 		return
-	fi
-
-	if command -v unshare &>/dev/null; then
-		if unshare --user --map-root-user true &>/dev/null; then
-			echo "unshare"
-			return
-		fi
 	fi
 
 	echo "none"
@@ -144,14 +137,6 @@ run_container() {
 		"$BINARY" "$@"
 }
 
-run_unshare() {
-	exec unshare \
-		--user --map-root-user \
-		--pid --fork --mount-proc \
-		--net \
-		-- "$BINARY" "$@"
-}
-
 run_none() {
 	exec "$BINARY" "$@"
 }
@@ -169,11 +154,10 @@ run_backend() {
 	bubblewrap) run_bubblewrap "$@" ;;
 	podman) run_container podman "$@" ;;
 	docker) run_container docker "$@" ;;
-	unshare) run_unshare "$@" ;;
 	none) run_none "$@" ;;
 	*)
 		echo "error: unknown backend '$backend'" >&2
-		echo "usage: $0 [bubblewrap|podman|docker|unshare|none] [args...]" >&2
+		echo "usage: $0 [bubblewrap|podman|docker|none] [args...]" >&2
 		exit 1
 		;;
 	esac
@@ -187,7 +171,7 @@ main() {
 
 	# If first argument is a known backend, use it
 	case "${1:-}" in
-	bubblewrap | podman | docker | unshare | none)
+	bubblewrap | podman | docker | none)
 		run_backend "$@"
 		;;
 	*)
@@ -200,7 +184,7 @@ main() {
 		backend="$(find_backend)"
 
 		if [[ "$backend" == "none" ]]; then
-			echo ":: no isolation backend found (bubblewrap, podman, docker, unshare)"
+			echo ":: no isolation backend found (bubblewrap, podman, docker)"
 			echo ":: running without isolation is not recommended"
 			echo ""
 			echo "   to proceed anyway, run:"
