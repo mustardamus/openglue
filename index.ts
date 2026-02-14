@@ -1,5 +1,7 @@
+import { exists } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { ensureMise, runMise } from "./src/mise.ts";
+import { getChromiumExecutable, getPlaywrightBinDirs } from "./src/playwright.ts";
 
 const ROOT_DIR = import.meta.dir;
 
@@ -33,6 +35,27 @@ async function main() {
   await ensureMise(misePath);
   await runMise(misePath, ["trust"], env, ROOT_DIR);
   await runMise(misePath, ["install"], env, ROOT_DIR);
+
+  const browsersDir = join(env["XDG_CACHE_HOME"]!, "ms-playwright");
+  if (!(await exists(browsersDir))) {
+    await runMise(
+      misePath,
+      ["exec", "--", "playwright", "install", "chromium"],
+      env,
+      ROOT_DIR,
+    );
+  }
+
+  const playwrightBinDirs = await getPlaywrightBinDirs(browsersDir);
+  if (playwrightBinDirs.length > 0) {
+    env["PATH"] = playwrightBinDirs.join(":") + ":" + (env["PATH"] ?? "");
+  }
+
+  const chromiumPath = await getChromiumExecutable(browsersDir);
+  if (chromiumPath) {
+    env["CHROMIUM_BIN"] = chromiumPath;
+  }
+
   await runMise(
     misePath,
     [

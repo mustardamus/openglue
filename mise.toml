@@ -1,5 +1,8 @@
 [tools]
 bun = "latest"
+node = "latest"
+"npm:playwright" = "latest"
+"npm:chrome-devtools-mcp" = "latest"
 "aqua:fish-shell/fish-shell" = "latest"
 opencode = "latest"
 zellij = "latest"

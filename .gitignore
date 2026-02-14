@@ -4,4 +4,6 @@ mise
 data
 state
 cache
+config/google-chrome-for-testing
+config/pulse
 .env
