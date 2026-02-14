@@ -19,22 +19,22 @@ You end up in a beautiful, fully isolated terminal workspace. Everything lives i
 
 ## The Tool Belt
 
-| Tool | What It Does | Why It's Here |
-|------|-------------|---------------|
-| [Bun](https://bun.com) | JS/TS runtime | Fast. Like, unreasonably fast. |
-| [Node.js](https://nodejs.org) | JS runtime | Because npm packages still exist |
-| [Playwright](https://playwright.dev) | Browser automation | Installs Chromium for Chrome DevTools MCP |
-| [Chrome DevTools MCP](https://www.npmjs.com/package/chrome-devtools-mcp) | MCP server | Lets AI coding assistants inspect browsers |
-| [Zellij MCP Server](https://github.com/mustardamus/zellij-mcp-server) | MCP server | Lets AI coding assistants control Zellij sessions |
-| [Fish](https://fishshell.com) | Shell | Autocompletions that actually work |
-| [opencode](https://opencode.ai) | AI coding assistant | Your new pair programmer (TUI) |
-| [Zellij](https://zellij.dev) | Terminal multiplexer | tmux but you don't need a PhD to configure it |
-| [Starship](https://starship.rs) | Shell prompt | Minimal, fast, cross-shell prompt |
-| [lazygit](https://github.com/jesseduffield/lazygit) | Git TUI | For when `git log --oneline --graph` isn't cutting it |
-| [Python](https://python.org) | Language runtime | The lingua franca of scripts, ML, and "it works on my laptop" |
-| [uv](https://github.com/astral-sh/uv) | Python package manager | pip but mass-produced in Rust |
-| [Rust](https://rust-lang.org) | Language toolchain | For when you want speed and the compiler to yell at you |
-| [Go](https://go.dev) | Language toolchain | Concurrency, simplicity, and `if err != nil` |
+| Tool                                                                     | What It Does           | Why It's Here                                                 |
+| ------------------------------------------------------------------------ | ---------------------- | ------------------------------------------------------------- |
+| [Bun](https://bun.com)                                                   | JS/TS runtime          | Fast. Like, unreasonably fast.                                |
+| [Node.js](https://nodejs.org)                                            | JS runtime             | Because npm packages still exist                              |
+| [Playwright](https://playwright.dev)                                     | Browser automation     | Installs Chromium for Chrome DevTools MCP                     |
+| [Chrome DevTools MCP](https://www.npmjs.com/package/chrome-devtools-mcp) | MCP server             | Lets AI coding assistants inspect browsers                    |
+| [Zellij MCP Server](https://github.com/mustardamus/zellij-mcp-server)    | MCP server             | Lets AI coding assistants control Zellij sessions             |
+| [Fish](https://fishshell.com)                                            | Shell                  | Autocompletions that actually work                            |
+| [opencode](https://opencode.ai)                                          | AI coding assistant    | Your new pair programmer (TUI)                                |
+| [Zellij](https://zellij.dev)                                             | Terminal multiplexer   | tmux but you don't need a PhD to configure it                 |
+| [Starship](https://starship.rs)                                          | Shell prompt           | Minimal, fast, cross-shell prompt                             |
+| [lazygit](https://github.com/jesseduffield/lazygit)                      | Git TUI                | For when `git log --oneline --graph` isn't cutting it         |
+| [Python](https://python.org)                                             | Language runtime       | The lingua franca of scripts, ML, and "it works on my laptop" |
+| [uv](https://github.com/astral-sh/uv)                                    | Python package manager | pip but mass-produced in Rust                                 |
+| [Rust](https://rust-lang.org)                                            | Language toolchain     | For when you want speed and the compiler to yell at you       |
+| [Go](https://go.dev)                                                     | Language toolchain     | Concurrency, simplicity, and `if err != nil`                  |
 
 ## Getting Started
 
@@ -66,17 +66,17 @@ That's it. Go make coffee. When you come back, you'll have a fully configured Ze
 
 The `.env` file controls where everything lives. By default, all paths are relative to the project root:
 
-| Variable | Default | What It Controls |
-|----------|---------|-----------------|
-| `MISE_DATA_DIR` | `./mise` | Where mise stores its data |
-| `MISE_CACHE_DIR` | `./mise/cache` | Where mise caches downloads |
-| `XDG_CONFIG_HOME` | `./config` | Tool configurations (Fish, Zellij, lazygit, etc.) |
-| `XDG_DATA_HOME` | `./data` | Application data |
-| `XDG_STATE_HOME` | `./state` | Application state |
-| `XDG_CACHE_HOME` | `./cache` | Caches (including Playwright browsers) |
-| `SESSION_NAME` | `openglue` | Zellij session name |
-| `BROWSER` | `zen-browser` | Default browser |
-| `ZELLIJ_MCP_SERVER_DUMP_DIR` | `./cache/zellij-mcp-server` | Zellij MCP Server dump directory |
+| Variable                     | Default                     | What It Controls                                  |
+| ---------------------------- | --------------------------- | ------------------------------------------------- |
+| `MISE_DATA_DIR`              | `./mise`                    | Where mise stores its data                        |
+| `MISE_CACHE_DIR`             | `./mise/cache`              | Where mise caches downloads                       |
+| `XDG_CONFIG_HOME`            | `./config`                  | Tool configurations (Fish, Zellij, lazygit, etc.) |
+| `XDG_DATA_HOME`              | `./data`                    | Application data                                  |
+| `XDG_STATE_HOME`             | `./state`                   | Application state                                 |
+| `XDG_CACHE_HOME`             | `./cache`                   | Caches (including Playwright browsers)            |
+| `SESSION_NAME`               | `openglue`                  | Zellij session name                               |
+| `BROWSER`                    | `zen-browser`               | Default browser                                   |
+| `ZELLIJ_MCP_SERVER_DUMP_DIR` | `./cache/zellij-mcp-server` | Zellij MCP Server dump directory                  |
 
 ## Project Structure
 

@@ -1,32 +1,28 @@
 {
-  "$schema": "https://opencode.ai/config.json",
-  "theme": "tokyonight",
-  "model": "anthropic/claude-opus-4-6",
-  "autoupdate": false,
-  "permission": {
-    "edit": "allow",
-    "bash": {
-      "git commit": "ask"
-    }
-  },
-  "mcp": {
-    "chrome-devtools": {
-      "enabled": true,
-      "type": "local",
-      "command": [
-        "bash",
-        "-c",
-        "chrome-devtools-mcp --executablePath=$CHROMIUM_BIN --headless=true --isolated"
-      ]
-    },
-    "zellij": {
-      "enabled": true,
-      "type": "local",
-      "command": [
-        "bash",
-        "-c",
-        "bun ./cache/zellij-mcp-server/src/index.ts"
-      ]
-    }
-  }
+	"$schema": "https://opencode.ai/config.json",
+	"theme": "tokyonight",
+	"model": "anthropic/claude-opus-4-6",
+	"autoupdate": false,
+	"permission": {
+		"edit": "allow",
+		"bash": {
+			"git commit": "ask"
+		}
+	},
+	"mcp": {
+		"chrome-devtools": {
+			"enabled": true,
+			"type": "local",
+			"command": [
+				"bash",
+				"-c",
+				"chrome-devtools-mcp --executablePath=$CHROMIUM_BIN --headless=true --isolated"
+			]
+		},
+		"zellij": {
+			"enabled": true,
+			"type": "local",
+			"command": ["bash", "-c", "bun ./cache/zellij-mcp-server/src/index.ts"]
+		}
+	}
 }
