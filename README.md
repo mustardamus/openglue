@@ -6,16 +6,19 @@ Think of it as the glue that holds a bunch of fantastic open-source tools togeth
 
 ## What It Actually Does
 
-When you run `bun run index.ts`, the following cascade of events unfolds:
+When you run the binary (or `bun run index.ts`), the following cascade of events unfolds:
 
-1. Downloads [mise](https://github.com/jdx/mise) (a polyglot runtime manager) if it's not already sitting in `./bin/`
-2. Uses mise to install a curated set of tools (see below)
-3. Installs a Chromium browser via Playwright (for Chrome DevTools MCP -- yes, your AI can browse the web now, be afraid)
-4. Clones and installs the [Zellij MCP Server](https://github.com/mustardamus/zellij-mcp-server) (so your AI can manage terminal panes too -- no one is safe)
-5. Wires up all the environment paths so tools can actually find each other
-6. Launches a [Zellij](https://zellij.dev/) terminal multiplexer session with [Fish](https://fishshell.com/) shell, Tokyo Night theme, and a preconfigured layout
+1. Bootstraps embedded config files (mise.toml, zellij, fish, starship, opencode, etc.) to the working directory if they don't already exist
+2. Downloads [mise](https://github.com/jdx/mise) (a polyglot runtime manager) if it's not already sitting in `./bin/`
+3. Uses mise to install a curated set of tools (see below), installing Node.js first so npm is available for npm-based packages
+4. Installs a Chromium browser via Playwright (for Chrome DevTools MCP -- yes, your AI can browse the web now, be afraid)
+5. Clones and installs the [Zellij MCP Server](https://github.com/mustardamus/zellij-mcp-server) (so your AI can manage terminal panes too -- no one is safe)
+6. Wires up all the environment paths so tools can actually find each other
+7. Launches a [Zellij](https://zellij.dev/) terminal multiplexer session with [Fish](https://fishshell.com/) shell, Tokyo Night theme, and a preconfigured layout
 
 You end up in a beautiful, fully isolated terminal workspace. Everything lives inside the project directory. Delete the folder and it's like it never happened. Like a responsible one-night stand with your operating system.
+
+The Zellij session name is derived from the basename of the current working directory, so running from `/home/user/myproject` gives you a session named `myproject`.
 
 ## The Tool Belt
 
@@ -55,13 +58,13 @@ For file types not listed above, the format command will research the standard f
 
 Code linting is handled by the `/lint` command in opencode. Like `/format`, it automatically detects changed files, maps them to the appropriate linter, and installs any missing linters via mise on-the-fly.
 
-| Linter       | Mise package          | File types                                                               |
-| ------------ | --------------------- | ------------------------------------------------------------------------ |
-| Biome        | `npm:@biomejs/biome`  | `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`, `.json`, `.jsonc`, `.css`, `.scss` |
-| Taplo        | `npm:@taplo/cli`      | `.toml`                                                                  |
-| markdownlint | `npm:markdownlint-cli`| `.md`                                                                    |
-| yamllint     | `pipx:yamllint`       | `.yaml`, `.yml`                                                          |
-| kdlfmt       | `cargo:kdlfmt`        | `.kdl`                                                                   |
+| Linter       | Mise package           | File types                                                               |
+| ------------ | ---------------------- | ------------------------------------------------------------------------ |
+| Biome        | `npm:@biomejs/biome`   | `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`, `.json`, `.jsonc`, `.css`, `.scss` |
+| Taplo        | `npm:@taplo/cli`       | `.toml`                                                                  |
+| markdownlint | `npm:markdownlint-cli` | `.md`                                                                    |
+| yamllint     | `pipx:yamllint`        | `.yaml`, `.yml`                                                          |
+| kdlfmt       | `cargo:kdlfmt`         | `.kdl`                                                                   |
 
 For file types not listed above, the lint command will research the standard linter, propose it, and install it on confirmation. All linters are managed through mise and run via `mise exec --`.
 
@@ -69,11 +72,23 @@ For file types not listed above, the lint command will research the standard lin
 
 ### Prerequisites
 
-- [Bun](https://bun.com) v1.3.9+ installed on your system (the one global install we couldn't avoid, sorry)
 - Linux or macOS (x64 or ARM)
 - An internet connection (at least for the first run)
 
-### Installation
+### Using the Compiled Binary
+
+Download the binary for your platform from releases and run it from any directory:
+
+```bash
+mkdir myproject && cd myproject
+./openglue-linux-x64
+```
+
+That's it. The binary embeds all necessary config files and bootstraps them on first run. Go make coffee. When you come back, you'll have a fully configured Zellij session staring at you.
+
+### From Source
+
+Requires [Bun](https://bun.com) v1.3.9+.
 
 ```bash
 # Clone the repo
@@ -82,14 +97,14 @@ git clone <this-repo-url> && cd openglue
 # Install the one TypeScript dependency we have
 bun install
 
-# Copy the env template
-cp .env.example .env
-
-# Launch the whole thing
+# Launch directly
 bun run index.ts
+
+# Or build the binaries
+bun run build
 ```
 
-That's it. Go make coffee. When you come back, you'll have a fully configured Zellij session staring at you.
+The build produces binaries for all supported platforms in `./dist/`.
 
 ### Environment Variables
 
@@ -103,7 +118,6 @@ The `.env` file controls where everything lives. By default, all paths are relat
 | `XDG_DATA_HOME`              | `./data`                    | Application data                                  |
 | `XDG_STATE_HOME`             | `./state`                   | Application state                                 |
 | `XDG_CACHE_HOME`             | `./cache`                   | Caches (including Playwright browsers)            |
-| `SESSION_NAME`               | `openglue`                  | Zellij session name                               |
 | `BROWSER`                    | `zen-browser`               | Default browser                                   |
 | `ZELLIJ_MCP_SERVER_DUMP_DIR` | `./cache/zellij-mcp-server` | Zellij MCP Server dump directory                  |
 
@@ -113,9 +127,12 @@ The `.env` file controls where everything lives. By default, all paths are relat
 openglue/
 ├── index.ts              # The orchestrator. Runs the whole show.
 ├── src/
+│   ├── bootstrap.ts      # Embeds and writes config files on first run
 │   ├── github.ts         # GitHub API client for downloading releases
 │   ├── mise.ts           # mise binary management and command runner
 │   └── playwright.ts     # Chromium installation and path discovery
+├── tasks/
+│   └── build.ts          # Cross-platform binary compilation script
 ├── config/               # All tool configs live here (XDG_CONFIG_HOME)
 │   ├── fish/             # Fish shell config
 │   ├── starship.toml     # Starship prompt config

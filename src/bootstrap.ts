@@ -10,6 +10,7 @@ import zellijLayout from "../config/zellij/layouts/default.kdl" with {
 import fishConfig from "../config/fish/config.fish" with { type: "text" };
 import starshipConfig from "../config/starship.toml" with { type: "text" };
 import markdownlintJson from "../.markdownlint.json" with { type: "text" };
+import gitignore from "../.gitignore" with { type: "text" };
 
 interface EmbeddedFile {
 	path: string;
@@ -18,6 +19,7 @@ interface EmbeddedFile {
 
 function getEmbeddedFiles(rootDir: string): EmbeddedFile[] {
 	return [
+		{ path: join(rootDir, ".gitignore"), content: gitignore },
 		{ path: join(rootDir, "mise.toml"), content: miseToml },
 		{ path: join(rootDir, "opencode.json"), content: opencodeJson },
 		{ path: join(rootDir, ".markdownlint.json"), content: markdownlintJson },
