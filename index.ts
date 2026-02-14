@@ -1,30 +1,61 @@
 import { exists } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { basename, join, resolve } from "node:path";
 import { ensureMise, runMise } from "./src/mise.ts";
 import {
 	getChromiumExecutable,
 	getPlaywrightBinDirs,
 } from "./src/playwright.ts";
+import { bootstrapConfigs } from "./src/bootstrap.ts";
 
-const ROOT_DIR = import.meta.dir;
+const ROOT_DIR = process.cwd();
+
+const defaults: Record<string, string> = {
+	MISE_DATA_DIR: "./mise",
+	MISE_CACHE_DIR: "./mise/cache",
+	MISE_CONFIG_DIR: ".",
+	MISE_STATE_DIR: "./mise/state",
+	XDG_CONFIG_HOME: "./config",
+	XDG_CONFIG_DIRS: "./config",
+	XDG_DATA_HOME: "./data",
+	XDG_DATA_DIRS: "./data",
+	XDG_STATE_HOME: "./state",
+	XDG_CACHE_HOME: "./cache",
+	BROWSER: "zen-browser",
+	ZELLIJ_CONFIG: "./config/zellij/config.kdl",
+	ZELLIJ_LAYOUT: "./config/zellij/layouts/default.kdl",
+	ZELLIJ_MCP_SERVER_DUMP_DIR: "./cache/zellij-mcp-server",
+};
+
+function resolveValue(value: string): string {
+	return value.startsWith("./") || value.startsWith("/")
+		? resolve(ROOT_DIR, value)
+		: value;
+}
 
 async function loadEnv(): Promise<Record<string, string>> {
-	const content = await Bun.file(join(ROOT_DIR, ".env")).text();
 	const env: Record<string, string> = {};
 
-	for (const line of content.split("\n")) {
-		const trimmed = line.trim();
-		if (!trimmed || trimmed.startsWith("#")) continue;
+	const envFile = join(ROOT_DIR, ".env");
+	if (await exists(envFile)) {
+		const content = await Bun.file(envFile).text();
 
-		const idx = trimmed.indexOf("=");
-		if (idx === -1) continue;
+		for (const line of content.split("\n")) {
+			const trimmed = line.trim();
+			if (!trimmed || trimmed.startsWith("#")) continue;
 
-		const key = trimmed.slice(0, idx);
-		const value = trimmed.slice(idx + 1);
-		env[key] =
-			value.startsWith("./") || value.startsWith("/")
-				? resolve(ROOT_DIR, value)
-				: value;
+			const idx = trimmed.indexOf("=");
+			if (idx === -1) continue;
+
+			const key = trimmed.slice(0, idx);
+			const value = trimmed.slice(idx + 1);
+			env[key] = resolveValue(value);
+		}
+	}
+
+	for (const [key, value] of Object.entries(defaults)) {
+		if (!(key in env)) {
+			env[key] = resolveValue(value);
+		}
 	}
 
 	return env;
@@ -41,8 +72,11 @@ async function main() {
 		"default.kdl",
 	);
 
+	await bootstrapConfigs(ROOT_DIR);
+
 	await ensureMise(misePath);
 	await runMise(misePath, ["trust"], env, ROOT_DIR);
+	await runMise(misePath, ["install", "node"], env, ROOT_DIR);
 	await runMise(misePath, ["install"], env, ROOT_DIR);
 
 	const browsersDir = join(env.XDG_CACHE_HOME ?? "", "ms-playwright");
@@ -98,7 +132,7 @@ async function main() {
 			"--layout",
 			zellijLayout,
 			"attach",
-			env.SESSION_NAME ?? "",
+			basename(ROOT_DIR),
 			"--create",
 		],
 		env,

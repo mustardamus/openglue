@@ -7,6 +7,9 @@
 	"peerDependencies": {
 		"typescript": "^5"
 	},
+	"scripts": {
+		"build": "bun run tasks/build.ts"
+	},
 	"private": true,
 	"type": "module"
 }

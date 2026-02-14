@@ -8,3 +8,4 @@ cache
 config/google-chrome-for-testing
 config/pulse
 config/go
+dist
