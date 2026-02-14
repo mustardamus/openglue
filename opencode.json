@@ -23,8 +23,9 @@
       "enabled": true,
       "type": "local",
       "command": [
-        "node",
-        "./cache/zellij-mcp-server/dist/index.js"
+        "bash",
+        "-c",
+        "bun ./cache/zellij-mcp-server/src/index.ts"
       ]
     }
   }

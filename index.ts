@@ -48,11 +48,17 @@ async function main() {
 
   const zellijMcpDir = join(env["XDG_CACHE_HOME"]!, "zellij-mcp-server");
   if (!(await exists(zellijMcpDir))) {
-    const proc = Bun.spawn(
-      ["git", "clone", "https://github.com/GitJuhb/zellij-mcp-server.git", zellijMcpDir],
+    const cloneProc = Bun.spawn(
+      ["git", "clone", "https://github.com/mustardamus/zellij-mcp-server.git", zellijMcpDir],
       { stdout: "inherit", stderr: "inherit", env: { ...process.env, ...env } },
     );
-    await proc.exited;
+    await cloneProc.exited;
+
+    const installProc = Bun.spawn(
+      ["bun", "install"],
+      { stdout: "inherit", stderr: "inherit", cwd: zellijMcpDir, env: { ...process.env, ...env } },
+    );
+    await installProc.exited;
   }
 
   const playwrightBinDirs = await getPlaywrightBinDirs(browsersDir);
