@@ -1,3 +1,5 @@
 node_modules
-bin
 mise
+data
+cache
+.env

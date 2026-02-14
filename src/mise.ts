@@ -1,12 +1,6 @@
-import { chmod, exists, mkdir } from "node:fs/promises";
+import { exists } from "node:fs/promises";
 import { join } from "node:path";
 import { downloadLatestReleaseAsset } from "./github.ts";
-
-const ROOT_DIR = join(import.meta.dir, "..");
-const BIN_DIR = join(ROOT_DIR, "bin");
-const MISE_DIR = join(ROOT_DIR, "mise");
-const MISE_PATH = join(MISE_DIR, "mise");
-const MISE_WRAPPER = join(BIN_DIR, "mise");
 
 function getMiseAssetSuffix(): string {
   const platform = process.platform;
@@ -42,27 +36,38 @@ function getMiseAssetSuffix(): string {
   return `${os}-${cpu}`;
 }
 
-export async function getLatestMise(): Promise<string> {
+export async function getLatestMise(dest: string): Promise<string> {
   const suffix = getMiseAssetSuffix();
 
-  const { dest } = await downloadLatestReleaseAsset({
+  const { dest: result } = await downloadLatestReleaseAsset({
     repo: "jdx/mise",
-    dest: MISE_PATH,
+    dest,
     executable: true,
     assetFilter: (asset, release) =>
       asset.name === `mise-${release.tag_name}-${suffix}`,
   });
 
-  return dest;
+  return result;
 }
 
-export async function runMise(args: string[]): Promise<void> {
-  if (!(await exists(MISE_WRAPPER))) {
-    throw new Error("mise wrapper not found. Run ensureMise() first.");
+export async function ensureMise(misePath: string): Promise<void> {
+  if (!(await exists(misePath))) {
+    await getLatestMise(misePath);
+  }
+}
+
+export async function runMise(
+  misePath: string,
+  args: string[],
+  env: Record<string, string>,
+): Promise<void> {
+  if (!(await exists(misePath))) {
+    throw new Error("mise binary not found. Run ensureMise() first.");
   }
 
-  const proc = Bun.spawn([MISE_WRAPPER, ...args], {
-    cwd: ROOT_DIR,
+  const proc = Bun.spawn([misePath, ...args], {
+    cwd: join(misePath, ".."),
+    env: { ...process.env, ...env },
     stdin: "inherit",
     stdout: "inherit",
     stderr: "inherit",
@@ -73,37 +78,4 @@ export async function runMise(args: string[]): Promise<void> {
   if (exitCode !== 0) {
     throw new Error(`mise ${args.join(" ")} failed (exit ${exitCode})`);
   }
-}
-
-export async function createMiseWrapper(): Promise<void> {
-  if (await exists(MISE_WRAPPER)) {
-    return;
-  }
-
-  await mkdir(BIN_DIR, { recursive: true });
-
-  const script = `#!/usr/bin/env bash
-SCRIPT_DIR="$(cd "$(dirname "\${BASH_SOURCE[0]}")/.." && pwd)"
-
-export MISE_DATA_DIR="\${SCRIPT_DIR}/mise"
-export MISE_CACHE_DIR="\${SCRIPT_DIR}/mise/cache"
-export MISE_CONFIG_DIR="\${SCRIPT_DIR}"
-export MISE_STATE_DIR="\${SCRIPT_DIR}/mise/state"
-
-exec "\${SCRIPT_DIR}/mise/mise" "$@"
-`;
-
-  await Bun.write(MISE_WRAPPER, script);
-  await chmod(MISE_WRAPPER, 0o755);
-
-  console.log(`mise wrapper created at ${MISE_WRAPPER}`);
-}
-
-
-export async function ensureMise(): Promise<void> {
-  if (!(await exists(MISE_PATH))) {
-    await getLatestMise();
-  }
-
-  await createMiseWrapper();
 }
