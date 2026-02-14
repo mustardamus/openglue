@@ -31,6 +31,10 @@ You end up in a beautiful, fully isolated terminal workspace. Everything lives i
 | [Zellij](https://zellij.dev) | Terminal multiplexer | tmux but you don't need a PhD to configure it |
 | [Starship](https://starship.rs) | Shell prompt | Minimal, fast, cross-shell prompt |
 | [lazygit](https://github.com/jesseduffield/lazygit) | Git TUI | For when `git log --oneline --graph` isn't cutting it |
+| [Python](https://python.org) | Language runtime | The lingua franca of scripts, ML, and "it works on my laptop" |
+| [uv](https://github.com/astral-sh/uv) | Python package manager | pip but mass-produced in Rust |
+| [Rust](https://rust-lang.org) | Language toolchain | For when you want speed and the compiler to yell at you |
+| [Go](https://go.dev) | Language toolchain | Concurrency, simplicity, and `if err != nil` |
 
 ## Getting Started
 

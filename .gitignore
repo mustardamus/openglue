@@ -1,3 +1,4 @@
+.env
 node_modules
 bin
 mise
@@ -6,4 +7,4 @@ state
 cache
 config/google-chrome-for-testing
 config/pulse
-.env
+config/go
