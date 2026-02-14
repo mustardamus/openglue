@@ -94,6 +94,8 @@ async function main() {
 	await ensureMise(misePath);
 	await runMise(misePath, ["trust"], env, ROOT_DIR);
 	await runMise(misePath, ["install", "node"], env, ROOT_DIR);
+	await runMise(misePath, ["install", "python"], env, ROOT_DIR);
+	await runMise(misePath, ["install", "pipx"], env, ROOT_DIR);
 	await runMise(misePath, ["install"], env, ROOT_DIR);
 
 	const browsersDir = join(env.XDG_CACHE_HOME ?? "", "ms-playwright");
