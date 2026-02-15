@@ -165,6 +165,10 @@ run_backend() {
 
 main() {
 	if [[ -z "$BINARY" || ! -f "$BINARY" ]]; then
+		if command -v bun &>/dev/null && [[ -f "$SCRIPT_DIR/index.ts" ]]; then
+			echo ":: no binary found, falling back to bun index.ts"
+			exec bun "$SCRIPT_DIR/index.ts" "$@"
+		fi
 		echo "error: no openglue-* binary found in $SCRIPT_DIR" >&2
 		exit 1
 	fi

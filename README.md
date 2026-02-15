@@ -76,6 +76,7 @@ For file types not listed above, the lint command will research the standard lin
 
 - Linux or macOS (x64 or ARM)
 - An internet connection (at least for the first run)
+- [git](https://git-scm.com/) (the Zellij MCP server is currently cloned from source; TODO: release on npm and install via mise)
 
 ### Using the Compiled Binary
 
@@ -268,7 +269,7 @@ The result: **zero side effects on your system**. `rm -rf openglue/` and it's go
 
 ## The Philosophy
 
-- **One command to rule them all.** Run `bun run index.ts` and get a working dev environment.
+- **One command to rule them all.** Run `./run.sh` and get a working dev environment.
 - **Everything local.** No global installs (except Bun itself). No system pollution.
 - **Idempotent.** Run it again and it skips what's already installed. Re-entrant like a good function should be.
 - **Opinionated but open.** Tokyo Night theme, Fish shell, Zellij -- because defaults should be good defaults. But it's all just config files you can change.
