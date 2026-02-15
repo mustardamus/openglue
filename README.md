@@ -72,14 +72,22 @@ For file types not listed above, the lint command will research the standard lin
 
 ## Wizard
 
-openglue includes a TUI wizard (`src/wizard.ts`) built with [@opentui/core](https://github.com/engine-studio/opentui) that handles first-run setup interactively.
+openglue includes a modular TUI wizard system for first-run setup. The runner (`src/wizard.ts`) discovers all wizard step files in the `./wizard/` directory, sorts them by filename, and executes them sequentially. Each step is a standalone TypeScript file that exports a default async function.
 
-### What It Does
+Wizard files are numbered with a three-digit prefix to control execution order (e.g. `001-opencode-auth.ts`, `002-something-else.ts`). They are bootstrapped to the `./wizard/` directory on first run alongside the other embedded config files.
 
-On launch, the wizard checks whether opencode has been authenticated with a provider by looking for credentials in `$XDG_DATA_HOME/opencode/auth.json` (defaults to `./data/opencode/auth.json`).
+### Current Steps
 
-- **If authenticated:** Displays a confirmation message and continues.
-- **If not authenticated:** Prompts the user with a Yes/No select menu asking if they'd like to log in now. Selecting "Yes" destroys the wizard UI and opens a floating Zellij pane running `opencode auth login`. The pane closes automatically when the auth flow completes. Selecting "No" exits the wizard without authenticating.
+| File                    | What It Does                                                                                        |
+| ----------------------- | --------------------------------------------------------------------------------------------------- |
+| `001-opencode-auth.ts`  | Checks if opencode is authenticated. If not, prompts the user to log in via a floating Zellij pane. |
+| `999-start-opencode.ts` | Starts opencode as the final wizard step, after all other setup steps have completed.               |
+
+### Adding a Wizard Step
+
+1. Create a new file in `./wizard/` with the next number prefix (e.g. `002-my-step.ts`)
+2. Export a default async function
+3. Import the file as text in `src/bootstrap.ts` and add it to the embedded files list so it gets bootstrapped
 
 ### Running the Wizard
 
@@ -177,7 +185,9 @@ openglue/
 │   ├── github.ts         # GitHub API client for downloading releases
 │   ├── mise.ts           # mise binary management and command runner
 │   ├── playwright.ts     # Chromium installation and path discovery
-│   └── wizard.ts         # TUI wizard for first-run setup (auth, etc.)
+│   └── wizard.ts         # Wizard runner -- discovers and executes steps from ./wizard/
+├── wizard/               # Wizard step files (bootstrapped, numbered, executed in order)
+│   └── 001-opencode-auth.ts
 ├── tasks/
 │   └── build.ts          # Cross-platform binary compilation script
 ├── config/               # All tool configs live here (XDG_CONFIG_HOME)
