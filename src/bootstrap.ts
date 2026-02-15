@@ -10,6 +10,7 @@ import zellijLayout from "../config/zellij/layouts/default.kdl" with {
 import fishConfig from "../config/fish/config.fish" with { type: "text" };
 import starshipConfig from "../config/starship.toml" with { type: "text" };
 import markdownlintJson from "../.markdownlint.json" with { type: "text" };
+import packageJson from "../package.json" with { type: "text" };
 import gitignore from "../.gitignore" with { type: "text" };
 import runSh from "../run.sh" with { type: "text" };
 import wizardTs from "./wizard.ts" with { type: "text" };
@@ -41,6 +42,7 @@ function getEmbeddedFiles(rootDir: string): EmbeddedFile[] {
 		{ path: join(rootDir, "config", "fish", "fish_variables"), content: "" },
 		{ path: join(rootDir, "config", "lazygit", "config.yml"), content: "" },
 		{ path: join(rootDir, "config", "starship.toml"), content: starshipConfig },
+		{ path: join(rootDir, "package.json"), content: packageJson },
 		{ path: join(rootDir, "run.sh"), content: runSh, executable: true },
 		{ path: join(rootDir, "src", "wizard.ts"), content: wizardTs },
 	];

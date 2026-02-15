@@ -108,6 +108,14 @@ async function main() {
 		);
 	}
 
+	const bunInstallProc = Bun.spawn([misePath, "exec", "--", "bun", "install"], {
+		stdout: "inherit",
+		stderr: "inherit",
+		cwd: ROOT_DIR,
+		env: { ...process.env, ...env },
+	});
+	await bunInstallProc.exited;
+
 	const zellijMcpDir = join(env.XDG_CACHE_HOME ?? "", "zellij-mcp-server");
 	if (!(await exists(zellijMcpDir))) {
 		const cloneProc = Bun.spawn(
