@@ -70,6 +70,25 @@ Code linting is handled by the `/lint` command in opencode. Like `/format`, it a
 
 For file types not listed above, the lint command will research the standard linter, propose it, and install it on confirmation. All linters are managed through mise and run via `mise exec --`.
 
+## Wizard
+
+openglue includes a TUI wizard (`src/wizard.ts`) built with [@opentui/core](https://github.com/engine-studio/opentui) that handles first-run setup interactively.
+
+### What It Does
+
+On launch, the wizard checks whether opencode has been authenticated with a provider by looking for credentials in `$XDG_DATA_HOME/opencode/auth.json` (defaults to `./data/opencode/auth.json`).
+
+- **If authenticated:** Displays a confirmation message and continues.
+- **If not authenticated:** Prompts the user with a Yes/No select menu asking if they'd like to log in now. Selecting "Yes" destroys the wizard UI and opens a floating Zellij pane running `opencode auth login`. The pane closes automatically when the auth flow completes. Selecting "No" exits the wizard without authenticating.
+
+### Running the Wizard
+
+```bash
+bun run src/wizard.ts
+```
+
+The wizard is keyboard-driven -- arrow keys or `j`/`k` to navigate, `Enter` to confirm, `Ctrl+C` to exit.
+
 ## Getting Started
 
 ### Prerequisites
@@ -157,7 +176,8 @@ openglue/
 │   ├── bootstrap.ts      # Embeds and writes config files on first run
 │   ├── github.ts         # GitHub API client for downloading releases
 │   ├── mise.ts           # mise binary management and command runner
-│   └── playwright.ts     # Chromium installation and path discovery
+│   ├── playwright.ts     # Chromium installation and path discovery
+│   └── wizard.ts         # TUI wizard for first-run setup (auth, etc.)
 ├── tasks/
 │   └── build.ts          # Cross-platform binary compilation script
 ├── config/               # All tool configs live here (XDG_CONFIG_HOME)

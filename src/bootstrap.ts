@@ -12,6 +12,7 @@ import starshipConfig from "../config/starship.toml" with { type: "text" };
 import markdownlintJson from "../.markdownlint.json" with { type: "text" };
 import gitignore from "../.gitignore" with { type: "text" };
 import runSh from "../run.sh" with { type: "text" };
+import wizardTs from "./wizard.ts" with { type: "text" };
 
 interface EmbeddedFile {
 	path: string;
@@ -41,6 +42,7 @@ function getEmbeddedFiles(rootDir: string): EmbeddedFile[] {
 		{ path: join(rootDir, "config", "lazygit", "config.yml"), content: "" },
 		{ path: join(rootDir, "config", "starship.toml"), content: starshipConfig },
 		{ path: join(rootDir, "run.sh"), content: runSh, executable: true },
+		{ path: join(rootDir, "src", "wizard.ts"), content: wizardTs },
 	];
 }
 
