@@ -106,14 +106,58 @@ async function main() {
 	await runMise(misePath, ["install", "pipx"], env, ROOT_DIR);
 	await runMise(misePath, ["install"], env, ROOT_DIR);
 
+	// Chromium resolution order:
+	// 1. CHROMIUM_BIN env var (set by container image or user)
+	// 2. System-installed chromium/chrome on PATH (host binaries under bubblewrap)
+	// 3. Previously downloaded Playwright Chromium
+	// 4. Download via Playwright as last resort
 	const browsersDir = join(env.XDG_CACHE_HOME ?? "", "ms-playwright");
-	if (!(await exists(browsersDir))) {
-		await runMise(
-			misePath,
-			["exec", "--", "playwright", "install", "chromium"],
-			env,
-			ROOT_DIR,
-		);
+	const chromiumFromEnv = process.env.CHROMIUM_BIN;
+	const systemCandidates = [
+		"chromium-browser",
+		"chromium",
+		"google-chrome-stable",
+		"google-chrome",
+		"chrome",
+	];
+
+	if (chromiumFromEnv && (await exists(chromiumFromEnv))) {
+		env.CHROMIUM_BIN = chromiumFromEnv;
+	} else {
+		// Check for a system-installed browser on PATH
+		let found = false;
+		for (const name of systemCandidates) {
+			const proc = Bun.spawn(["which", name], {
+				stdout: "pipe",
+				stderr: "ignore",
+			});
+			const path = (await new Response(proc.stdout).text()).trim();
+			if ((await proc.exited) === 0 && path) {
+				env.CHROMIUM_BIN = path;
+				found = true;
+				break;
+			}
+		}
+
+		if (!found) {
+			// Fall back to Playwright-managed Chromium
+			if (!(await exists(browsersDir))) {
+				await runMise(
+					misePath,
+					["exec", "--", "playwright", "install", "chromium"],
+					env,
+					ROOT_DIR,
+				);
+			}
+
+			const chromiumPath = await getChromiumExecutable(browsersDir);
+			if (chromiumPath) env.CHROMIUM_BIN = chromiumPath;
+
+			const playwrightBinDirs = await getPlaywrightBinDirs(browsersDir);
+			if (playwrightBinDirs.length > 0) {
+				env.PATH = `${playwrightBinDirs.join(":")}:${env.PATH ?? ""}`;
+			}
+		}
 	}
 
 	const bunInstallProc = Bun.spawn([misePath, "exec", "--", "bun", "install"], {
@@ -144,16 +188,6 @@ async function main() {
 			env: { ...process.env, ...env },
 		});
 		await installProc.exited;
-	}
-
-	const playwrightBinDirs = await getPlaywrightBinDirs(browsersDir);
-	if (playwrightBinDirs.length > 0) {
-		env.PATH = `${playwrightBinDirs.join(":")}:${env.PATH ?? ""}`;
-	}
-
-	const chromiumPath = await getChromiumExecutable(browsersDir);
-	if (chromiumPath) {
-		env.CHROMIUM_BIN = chromiumPath;
 	}
 
 	await runMise(

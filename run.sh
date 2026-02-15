@@ -138,8 +138,16 @@ run_container() {
 	local cli="$1"
 	shift
 
+	local image="openglue"
+	local containerfile="$SCRIPT_DIR/Containerfile"
 	local selinux=""
 	[[ "$cli" == "podman" ]] && selinux=":Z"
+
+	# Build the image if it doesn't exist yet or the Containerfile changed.
+	if ! "$cli" image inspect "$image" &>/dev/null; then
+		echo ":: building container image '$image' (first run, may take a minute)..."
+		"$cli" build -t "$image" -f "$containerfile" "$SCRIPT_DIR"
+	fi
 
 	exec "$cli" run --rm --interactive --tty \
 		--env OPENGLUE_ISOLATION \
@@ -149,7 +157,7 @@ run_container() {
 		--env SHELL="/bin/sh" \
 		--volume "$SCRIPT_DIR:$SCRIPT_DIR$selinux" \
 		--workdir "$SCRIPT_DIR" \
-		docker.io/library/ubuntu:latest \
+		"$image" \
 		"$BINARY" "${BINARY_ARGS[@]}" "$@"
 }
 

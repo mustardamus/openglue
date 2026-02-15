@@ -11,7 +11,7 @@ When you run the binary (or `bun run index.ts`), the following cascade of events
 1. Bootstraps embedded config files (mise.toml, zellij, fish, starship, opencode, etc.) to the working directory if they don't already exist
 2. Downloads [mise](https://github.com/jdx/mise) (a polyglot runtime manager) if it's not already sitting in `./bin/`
 3. Uses mise to install a curated set of tools (see below), installing Node.js first so npm is available for npm-based packages
-4. Installs a Chromium browser via Playwright (for Chrome DevTools MCP -- yes, your AI can browse the web now, be afraid)
+4. Detects Chromium/Chrome -- checks `CHROMIUM_BIN` env var, then searches PATH for system-installed binaries (`chromium-browser`, `chromium`, `google-chrome-stable`, `google-chrome`, `chrome`), and only downloads one via Playwright as a last resort (for Chrome DevTools MCP -- yes, your AI can browse the web now, be afraid)
 5. Clones and installs the [Zellij MCP Server](https://github.com/mustardamus/zellij-mcp-server) (so your AI can manage terminal panes too -- no one is safe)
 6. Wires up all the environment paths so tools can actually find each other
 7. Launches a [Zellij](https://zellij.dev/) terminal multiplexer session with [Fish](https://fishshell.com/) shell, Tokyo Night theme, and a preconfigured layout
@@ -188,6 +188,7 @@ The `.env` file controls where everything lives. By default, all paths are relat
 openglue/
 ├── index.ts              # The orchestrator. Runs the whole show.
 ├── run.sh                # Isolation wrapper (embedded, bootstrapped on first run)
+├── Containerfile         # Container image definition (embedded, bootstrapped on first run)
 ├── src/
 │   ├── bootstrap.ts      # Embeds and writes config files on first run
 │   ├── github.ts         # GitHub API client for downloading releases
@@ -234,12 +235,25 @@ If no backend is found, `run.sh` prints install instructions and exits. It won't
 
 ### What the Podman/Docker Backend Does
 
-The container backend runs the binary inside an `ubuntu:latest` container with:
+The container backend builds a custom `openglue` image from the bootstrapped `Containerfile`, then runs the binary inside it.
+
+#### The Containerfile
+
+The `Containerfile` is embedded in the compiled binary and bootstrapped to disk alongside the other config files. It extends `ubuntu:latest` with:
+
+- **System libraries** -- `libatomic1` (required by Node.js), `ca-certificates`, `curl`, `git`
+- **Chromium** -- installed via `apt-get install chromium-browser`, which pulls all required shared libraries (libgbm, libnss3, libgtk-3-0, etc.)
+- **`CHROMIUM_BIN` environment variable** -- set to `/usr/bin/chromium-browser` so the Chrome DevTools MCP server can find it without Playwright-based detection
+
+The image is built once on first run and cached. Subsequent runs reuse the existing image.
+
+#### Container runtime behavior
 
 - **Project directory mounted read-write** -- the project directory is volume-mounted into the container (with `:Z` SELinux relabeling for Podman)
 - **Network access preserved** -- needed for downloading tools via mise on first run
 - **Terminal environment forwarded** -- `TERM`, `COLORTERM`, and `LANG` are passed through so Zellij and Fish render correctly
 - **Ephemeral container** -- `--rm` ensures the container is removed after the session ends; all persistent state lives in the project directory
+- **Chromium pre-installed** -- unlike the bubblewrap backend which inherits host libraries, the container image ships its own Chromium. The binary detects `CHROMIUM_BIN` in the environment and skips the Playwright download entirely
 
 ### Usage
 
@@ -267,6 +281,7 @@ The bubblewrap backend creates a sandboxed environment with:
 - **PTY support** -- `--dev /dev` creates a minimal devtmpfs so Zellij can allocate pseudo-terminals for its panes
 - **DNS and SSL/TLS** -- `/etc/resolv.conf`, `/etc/hosts`, and certificate directories are bind-mounted read-only
 - **Toolchain persistence** -- `RUSTUP_HOME`, `CARGO_HOME`, and `GOPATH` are pointed into the project's `data/` directory so mise doesn't reinstall them on every run
+- **Host Chromium/Chrome reuse** -- since host system binaries are bind-mounted read-only, any system-installed Chrome or Chromium (`chromium-browser`, `chromium`, `google-chrome-stable`, `google-chrome`, `chrome`) is automatically detected and used, skipping the Playwright download entirely
 
 ### Installing Bubblewrap
 
@@ -284,13 +299,16 @@ sudo dnf install bubblewrap
 ### The Bootstrap Sequence
 
 1. You run `./openglue-linux-x64` for the first time
-2. The binary writes all embedded config files to disk, including `run.sh`
+2. The binary writes all embedded config files to disk, including `run.sh` and `Containerfile`
 3. The binary detects `OPENGLUE_ISOLATION` is not set, prints a message pointing you to `run.sh`, and exits
 4. You run `./run.sh`
 5. `run.sh` detects the best isolation backend, sets `OPENGLUE_ISOLATION`, and execs the binary inside the sandbox
+   - For Podman/Docker: builds the `openglue` image from `Containerfile` on first run (installs system deps + Chromium), then starts the container
+   - For bubblewrap: enters the sandbox immediately (uses host libraries)
 6. The binary sees `OPENGLUE_ISOLATION` is set and proceeds with the full setup (mise, tools, Zellij, etc.)
+7. If `CHROMIUM_BIN` is already set (by the container image), the Playwright Chromium download is skipped
 
-On subsequent runs, `run.sh` already exists, so you just run `./run.sh` directly.
+On subsequent runs, `run.sh` already exists and the container image is cached, so you just run `./run.sh` directly.
 
 ## How It Works (The Nerdy Bits)
 
