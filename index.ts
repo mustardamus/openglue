@@ -6,6 +6,7 @@ import {
 	getPlaywrightBinDirs,
 } from "./src/playwright.ts";
 import { bootstrapConfigs } from "./src/bootstrap.ts";
+import { runWizard } from "./src/wizard.ts";
 
 const ROOT_DIR = process.cwd();
 
@@ -62,7 +63,14 @@ async function loadEnv(): Promise<Record<string, string>> {
 }
 
 async function main() {
+	const mode = process.argv[2] ?? "default";
+
 	await bootstrapConfigs(ROOT_DIR);
+
+	if (mode === "wizard") {
+		await runWizard();
+		return;
+	}
 
 	const isCompiledBinary = import.meta.path.startsWith("/$bunfs/");
 

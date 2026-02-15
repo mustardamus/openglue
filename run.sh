@@ -3,6 +3,22 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BINARY="$(find "$SCRIPT_DIR" -maxdepth 1 -name 'openglue-*' -print -quit 2>/dev/null)"
+BINARY_ARGS=()
+
+if [[ -z "$BINARY" || ! -f "$BINARY" ]]; then
+	if command -v bun &>/dev/null && [[ -f "$SCRIPT_DIR/index.ts" ]]; then
+		echo ":: no binary found, falling back to bun index.ts"
+		BINARY="$(command -v bun)"
+		BINARY_ARGS=("$SCRIPT_DIR/index.ts")
+	else
+		echo "error: no openglue-* binary found in $SCRIPT_DIR" >&2
+		exit 1
+	fi
+fi
+
+echo ":: binary: $BINARY"
+echo ":: binary args: ${BINARY_ARGS[*]}"
+echo ":: script args: $*"
 
 # ── Container detection ──────────────────────────────────────────────
 # Skip isolation if we're already inside a container/sandbox.
@@ -114,7 +130,7 @@ run_bubblewrap() {
 		--setenv XDG_RUNTIME_DIR "$runtime_dir"
 	)
 
-	args+=(-- "$BINARY" "$@")
+	args+=(-- "$BINARY" "${BINARY_ARGS[@]}" "$@")
 	exec "${args[@]}"
 }
 
@@ -134,11 +150,12 @@ run_container() {
 		--volume "$SCRIPT_DIR:$SCRIPT_DIR$selinux" \
 		--workdir "$SCRIPT_DIR" \
 		docker.io/library/ubuntu:latest \
-		"$BINARY" "$@"
+		"$BINARY" "${BINARY_ARGS[@]}" "$@"
 }
 
 run_none() {
-	exec "$BINARY" "$@"
+	echo ":: exec: $BINARY ${BINARY_ARGS[*]} $*"
+	exec "$BINARY" "${BINARY_ARGS[@]}" "$@"
 }
 
 # ── Main ─────────────────────────────────────────────────────────────
@@ -164,15 +181,6 @@ run_backend() {
 }
 
 main() {
-	if [[ -z "$BINARY" || ! -f "$BINARY" ]]; then
-		if command -v bun &>/dev/null && [[ -f "$SCRIPT_DIR/index.ts" ]]; then
-			echo ":: no binary found, falling back to bun index.ts"
-			exec bun "$SCRIPT_DIR/index.ts" "$@"
-		fi
-		echo "error: no openglue-* binary found in $SCRIPT_DIR" >&2
-		exit 1
-	fi
-
 	# If first argument is a known backend, use it
 	case "${1:-}" in
 	bubblewrap | podman | docker | none)

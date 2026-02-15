@@ -2,8 +2,8 @@ layout {
     pane size=1 borderless=true {
         plugin location="tab-bar"
     }
-    pane command="bun" {
-        args "run" "src/wizard.ts"
+    pane command="bash" {
+        args "./run.sh" "none" "wizard"
     }
     pane size=1 borderless=true {
         plugin location="status-bar"

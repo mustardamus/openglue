@@ -47,7 +47,7 @@ async function openAuthPane(): Promise<void> {
 	await proc.exited;
 }
 
-export default async function (): Promise<void> {
+async function main(): Promise<void> {
 	const renderer = await createCliRenderer({
 		exitOnCtrlC: true,
 	});
@@ -110,4 +110,8 @@ export default async function (): Promise<void> {
 			),
 		);
 	});
+}
+
+if (import.meta.main) {
+	await main();
 }

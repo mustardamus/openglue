@@ -91,8 +91,16 @@ Wizard files are numbered with a three-digit prefix to control execution order (
 
 ### Running the Wizard
 
+The wizard runs automatically in the first pane of the Zellij layout. The layout runs `./run.sh none wizard`, which passes the `wizard` argument to the binary, triggering the wizard runner instead of the normal bootstrap flow.
+
+You can also run it manually:
+
 ```bash
-bun run src/wizard.ts
+# From source
+bun run index.ts wizard
+
+# Or with the compiled binary
+./openglue-linux-x64 wizard
 ```
 
 The wizard is keyboard-driven -- arrow keys or `j`/`k` to navigate, `Enter` to confirm, `Ctrl+C` to exit.
