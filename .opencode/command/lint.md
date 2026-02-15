@@ -15,20 +15,21 @@ untracked files. Deduplicate the list. Skip files that no longer exist on disk.
 
 Use this mapping to determine which linter and mise package to use:
 
-| Extensions                           | Linter        | Mise package                  | Lint command                     |
-| ------------------------------------ | ------------- | ----------------------------- | -------------------------------- |
-| `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs` | Biome         | `npm:@biomejs/biome`          | `biome lint <file>`              |
-| `.json`, `.jsonc`                    | Biome         | `npm:@biomejs/biome`          | `biome lint <file>`              |
-| `.css`, `.scss`                      | Biome         | `npm:@biomejs/biome`          | `biome lint <file>`              |
-| `.py`                                | Ruff          | `pipx:ruff`                   | `ruff check <file>`              |
-| `.rs`                                | Clippy        | (bundled with rust)           | `cargo clippy -- -W clippy::all` |
-| `.go`                                | golangci-lint | `aqua:golangci/golangci-lint` | `golangci-lint run <file>`       |
-| `.md`                                | markdownlint  | `npm:markdownlint-cli`        | `markdownlint <file>`            |
-| `.html`                              | HTMLHint      | `npm:htmlhint`                | `htmlhint <file>`                |
-| `.yaml`, `.yml`                      | yamllint      | `pipx:yamllint`               | `yamllint <file>`                |
-| `.toml`                              | Taplo         | `npm:@taplo/cli`              | `taplo check <file>`             |
-| `.kdl`                               | kdlfmt        | `cargo:kdlfmt`                | `kdlfmt check <file>`            |
-| `.sh`                                | shellcheck    | `aqua:koalaman/shellcheck`    | `shellcheck <file>`              |
+| Extensions                           | Linter           | Mise package                  | Lint command                     |
+| ------------------------------------ | ---------------- | ----------------------------- | -------------------------------- |
+| `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs` | Biome            | `npm:@biomejs/biome`          | `biome lint <file>`              |
+| `.json`, `.jsonc`                    | Biome            | `npm:@biomejs/biome`          | `biome lint <file>`              |
+| `.css`, `.scss`                      | Biome            | `npm:@biomejs/biome`          | `biome lint <file>`              |
+| `.py`                                | Ruff             | `pipx:ruff`                   | `ruff check <file>`              |
+| `.rs`                                | Clippy           | (bundled with rust)           | `cargo clippy -- -W clippy::all` |
+| `.go`                                | golangci-lint    | `aqua:golangci/golangci-lint` | `golangci-lint run <file>`       |
+| `.md`                                | markdownlint     | `npm:markdownlint-cli`        | `markdownlint <file>`            |
+| `.html`                              | HTMLHint         | `npm:htmlhint`                | `htmlhint <file>`                |
+| `.yaml`, `.yml`                      | yamllint         | `pipx:yamllint`               | `yamllint <file>`                |
+| `.toml`                              | Taplo            | `npm:@taplo/cli`              | `taplo check <file>`             |
+| `.kdl`                               | kdlfmt           | `cargo:kdlfmt`                | `kdlfmt check <file>`            |
+| `.sh`                                | shellcheck       | `aqua:koalaman/shellcheck`    | `shellcheck <file>`              |
+| `Dockerfile`, `Containerfile`        | dockerfile-utils | `npm:dockerfile-utils`        | `dockerfile-utils lint <file>`   |
 
 If a file extension is **not** in this table, do NOT skip it. Instead:
 

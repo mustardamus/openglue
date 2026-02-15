@@ -15,20 +15,21 @@ untracked files. Deduplicate the list. Skip files that no longer exist on disk.
 
 Use this mapping to determine which formatter and mise package to use:
 
-| Extensions                           | Formatter | Mise package         | Format command                |
-| ------------------------------------ | --------- | -------------------- | ----------------------------- |
-| `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs` | Biome     | `npm:@biomejs/biome` | `biome format --write <file>` |
-| `.json`, `.jsonc`                    | Biome     | `npm:@biomejs/biome` | `biome format --write <file>` |
-| `.css`, `.scss`                      | Biome     | `npm:@biomejs/biome` | `biome format --write <file>` |
-| `.py`                                | Ruff      | `pipx:ruff`          | `ruff format <file>`          |
-| `.rs`                                | rustfmt   | (bundled with rust)  | `rustfmt <file>`              |
-| `.go`                                | gofmt     | (bundled with go)    | `gofmt -w <file>`             |
-| `.md`                                | Prettier  | `npm:prettier`       | `prettier --write <file>`     |
-| `.html`                              | Prettier  | `npm:prettier`       | `prettier --write <file>`     |
-| `.yaml`, `.yml`                      | Prettier  | `npm:prettier`       | `prettier --write <file>`     |
-| `.toml`                              | Taplo     | `npm:@taplo/cli`     | `taplo format <file>`         |
-| `.kdl`                               | kdlfmt    | `cargo:kdlfmt`       | `kdlfmt format <file>`        |
-| `.sh`                                | shfmt     | `aqua:mvdan/sh`      | `shfmt -w <file>`             |
+| Extensions                           | Formatter        | Mise package           | Format command                   |
+| ------------------------------------ | ---------------- | ---------------------- | -------------------------------- |
+| `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs` | Biome            | `npm:@biomejs/biome`   | `biome format --write <file>`    |
+| `.json`, `.jsonc`                    | Biome            | `npm:@biomejs/biome`   | `biome format --write <file>`    |
+| `.css`, `.scss`                      | Biome            | `npm:@biomejs/biome`   | `biome format --write <file>`    |
+| `.py`                                | Ruff             | `pipx:ruff`            | `ruff format <file>`             |
+| `.rs`                                | rustfmt          | (bundled with rust)    | `rustfmt <file>`                 |
+| `.go`                                | gofmt            | (bundled with go)      | `gofmt -w <file>`                |
+| `.md`                                | Prettier         | `npm:prettier`         | `prettier --write <file>`        |
+| `.html`                              | Prettier         | `npm:prettier`         | `prettier --write <file>`        |
+| `.yaml`, `.yml`                      | Prettier         | `npm:prettier`         | `prettier --write <file>`        |
+| `.toml`                              | Taplo            | `npm:@taplo/cli`       | `taplo format <file>`            |
+| `.kdl`                               | kdlfmt           | `cargo:kdlfmt`         | `kdlfmt format <file>`           |
+| `.sh`                                | shfmt            | `aqua:mvdan/sh`        | `shfmt -w <file>`                |
+| `Dockerfile`, `Containerfile`        | dockerfile-utils | `npm:dockerfile-utils` | `dockerfile-utils format <file>` |
 
 If a file extension is **not** in this table, do NOT skip it. Instead:
 

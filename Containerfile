@@ -7,9 +7,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 #   - General toolchain: ca-certificates, curl, git
 #   - Chromium + runtime deps
 RUN apt-get update -qq && \
-    apt-get install -y -qq --no-install-recommends \
-        libatomic1 ca-certificates curl git \
-        chromium-browser \
-    && rm -rf /var/lib/apt/lists/*
+	apt-get install -y -qq --no-install-recommends \
+	libatomic1 ca-certificates curl git \
+	chromium-browser \
+	&& rm -rf /var/lib/apt/lists/*
 
 ENV CHROMIUM_BIN=/usr/bin/chromium-browser

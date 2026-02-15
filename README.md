@@ -43,15 +43,16 @@ The Zellij session name is derived from the basename of the current working dire
 
 Code formatting is handled by the `/format` command in opencode. It automatically detects changed files, maps them to the appropriate formatter, and installs any missing formatters via mise on-the-fly.
 
-| Formatter | Mise package         | File types                                                               |
-| --------- | -------------------- | ------------------------------------------------------------------------ |
-| Biome     | `npm:@biomejs/biome` | `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`, `.json`, `.jsonc`, `.css`, `.scss` |
-| Prettier  | `npm:prettier`       | `.md`, `.html`, `.yaml`, `.yml`                                          |
-| Taplo     | `npm:@taplo/cli`     | `.toml`                                                                  |
-| rustfmt   | (bundled with rust)  | `.rs`                                                                    |
-| gofmt     | (bundled with go)    | `.go`                                                                    |
-| kdlfmt    | `cargo:kdlfmt`       | `.kdl`                                                                   |
-| shfmt     | `aqua:mvdan/sh`      | `.sh`                                                                    |
+| Formatter        | Mise package           | File types                                                               |
+| ---------------- | ---------------------- | ------------------------------------------------------------------------ |
+| Biome            | `npm:@biomejs/biome`   | `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`, `.json`, `.jsonc`, `.css`, `.scss` |
+| Prettier         | `npm:prettier`         | `.md`, `.html`, `.yaml`, `.yml`                                          |
+| Taplo            | `npm:@taplo/cli`       | `.toml`                                                                  |
+| rustfmt          | (bundled with rust)    | `.rs`                                                                    |
+| gofmt            | (bundled with go)      | `.go`                                                                    |
+| kdlfmt           | `cargo:kdlfmt`         | `.kdl`                                                                   |
+| shfmt            | `aqua:mvdan/sh`        | `.sh`                                                                    |
+| dockerfile-utils | `npm:dockerfile-utils` | `Dockerfile`, `Containerfile`                                            |
 
 For file types not listed above, the format command will research the standard formatter, propose it, and install it on confirmation. All formatters are managed through mise and run via `mise exec --`.
 
@@ -59,14 +60,15 @@ For file types not listed above, the format command will research the standard f
 
 Code linting is handled by the `/lint` command in opencode. Like `/format`, it automatically detects changed files, maps them to the appropriate linter, and installs any missing linters via mise on-the-fly.
 
-| Linter       | Mise package               | File types                                                               |
-| ------------ | -------------------------- | ------------------------------------------------------------------------ |
-| Biome        | `npm:@biomejs/biome`       | `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`, `.json`, `.jsonc`, `.css`, `.scss` |
-| Taplo        | `npm:@taplo/cli`           | `.toml`                                                                  |
-| markdownlint | `npm:markdownlint-cli`     | `.md`                                                                    |
-| yamllint     | `pipx:yamllint`            | `.yaml`, `.yml`                                                          |
-| kdlfmt       | `cargo:kdlfmt`             | `.kdl`                                                                   |
-| shellcheck   | `aqua:koalaman/shellcheck` | `.sh`                                                                    |
+| Linter           | Mise package               | File types                                                               |
+| ---------------- | -------------------------- | ------------------------------------------------------------------------ |
+| Biome            | `npm:@biomejs/biome`       | `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`, `.json`, `.jsonc`, `.css`, `.scss` |
+| Taplo            | `npm:@taplo/cli`           | `.toml`                                                                  |
+| markdownlint     | `npm:markdownlint-cli`     | `.md`                                                                    |
+| yamllint         | `pipx:yamllint`            | `.yaml`, `.yml`                                                          |
+| kdlfmt           | `cargo:kdlfmt`             | `.kdl`                                                                   |
+| shellcheck       | `aqua:koalaman/shellcheck` | `.sh`                                                                    |
+| dockerfile-utils | `npm:dockerfile-utils`     | `Dockerfile`, `Containerfile`                                            |
 
 For file types not listed above, the lint command will research the standard linter, propose it, and install it on confirmation. All linters are managed through mise and run via `mise exec --`.
 
